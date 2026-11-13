@@ -127,9 +127,9 @@ public class FieldCentric extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Joystick controls
-            double y = gamepad1.left_stick_y * lowPower;
-            double x = -gamepad1.left_stick_x * lowPower;
-            double rx = -gamepad1.right_stick_x * lowPower;
+            double y = gamepad1.left_stick_y;
+            double x = -gamepad1.left_stick_x;
+            double rx = -gamepad1.right_stick_x;
 
             // Get robot heading
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
@@ -145,7 +145,7 @@ public class FieldCentric extends LinearOpMode {
                     activeIntake = 0;
                 }
                 else {
-                    outerIntakeVel = VELCONST * 0.5;
+                    outerIntakeVel = VELCONST * 0.6;
                     activeIntake = 1;
                 }
 
@@ -155,7 +155,7 @@ public class FieldCentric extends LinearOpMode {
                     activeIntake = 0;
                 }
                 else {
-                    outerIntakeVel = -VELCONST * 0.5;
+                    outerIntakeVel = -VELCONST * 0.6;
                     activeIntake = 2;
                 }
 
@@ -168,13 +168,13 @@ public class FieldCentric extends LinearOpMode {
                 innerIntakeVel = -VELCONST * 0.75;
             }
 
-            if (gamepad1.rightBumperWasPressed()){
-                if (lowPower == 1) {
-                    lowPower = 0.25;
-                } else {
-                    lowPower = 1;
-                }
+            if (gamepad1.right_bumper){
+                lowPower = 0.5;
             }
+            else lowPower = 1;
+            y *= lowPower;
+            x *= lowPower;
+            rx *= lowPower;
 
             if (gamepad1.leftBumperWasPressed()){
                 imu.resetYaw();
@@ -186,7 +186,7 @@ public class FieldCentric extends LinearOpMode {
                 activeLauncher  = !activeLauncher;
             }
 
-            if (gamepad2.aWasPressed()) manualTurret = !manualTurret;
+            // if (gamepad2.aWasPressed()) manualTurret = !manualTurret;
 
             /*
             Important numbers to aim
@@ -264,8 +264,11 @@ public class FieldCentric extends LinearOpMode {
                 else if (gamepad2.dpadLeftWasPressed()) {
                     turretTicksToRotate = turretSpin.getCurrentPosition() - 20;
                 }
-                if (gamepad2.x) {
-                    launcherVel = 0.75 * VELCONST;
+                if (gamepad2.left_bumper) {
+                    launcherVel = 1300;
+                }
+                else if (gamepad2.right_bumper) {
+                    launcherVel = 1200;
                 }
                 else launcherVel = 0;
             }
@@ -290,6 +293,7 @@ public class FieldCentric extends LinearOpMode {
             double rearRightVel = VELCONST * (rotY + rotX - rx) / denominator;
 
             // correcting for misaligned imu movements
+            /*
             frontLeftVel += Math.toDegrees(prevBotHeading - botHeading) * VELCONST / 50;
             frontRightVel -= Math.toDegrees(prevBotHeading - botHeading) * VELCONST / 50;
             // accounting for a velocity greater than the max by reducing the opposite wheel instead
@@ -301,6 +305,7 @@ public class FieldCentric extends LinearOpMode {
                 rearLeftVel += frontRightVel + VELCONST;
                 frontRightVel = -VELCONST;
             }
+             */
 
 
             // Send velocity to motors
@@ -312,7 +317,7 @@ public class FieldCentric extends LinearOpMode {
             outerIntake.setVelocity(outerIntakeVel);
             innerIntake.setVelocity(innerIntakeVel);
 
-            turretSpin.setTargetPosition(turretTicksToRotate);
+            turretSpin.setTargetPosition(0);
             turretSpin.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             // might want pid for this later instead
             turretSpin.setVelocity(0.25 * VELCONST);

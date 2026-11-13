@@ -63,35 +63,33 @@ public class ShootingAuto extends LinearOpMode {
         if (isStopRequested()) return;
         ElapsedTime timer = new ElapsedTime();
 
-        turretShoot.setVelocity(0.77 * VELCONST);
-
-        while (opModeIsActive() && timer.seconds() < 2);
-        innerIntake.setVelocity(VELCONST);
-        outerIntake.setVelocity(VELCONST);
-
-        while (opModeIsActive() && timer.seconds() < 6);
+        turretShoot.setVelocity(1200);
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        frontLeft.setTargetPosition(-1000);
+        frontLeft.setTargetPosition(-800);
         frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         frontLeft.setVelocity(VELCONST * 0.25);
 
-        rearLeft.setTargetPosition(-1000);
+        rearLeft.setTargetPosition(-800);
         rearLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rearLeft.setVelocity(VELCONST * 0.25);
 
-        frontRight.setTargetPosition(-1000);
+        frontRight.setTargetPosition(-800);
         frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         frontRight.setVelocity(VELCONST * 0.25);
 
-        rearRight.setTargetPosition(-1000);
+        rearRight.setTargetPosition(-800);
         rearRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rearRight.setVelocity(VELCONST * 0.25);
 
-        while (opModeIsActive() && timer.seconds() < 10);
+        while (opModeIsActive() && timer.seconds() < 3) printTelemetry();
+        innerIntake.setVelocity(VELCONST * 0.75);
+        outerIntake.setVelocity(VELCONST * 0.5);
+
+        while (opModeIsActive() && timer.seconds() < 12) printTelemetry();
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -117,29 +115,29 @@ public class ShootingAuto extends LinearOpMode {
         rearRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rearRight.setVelocity(VELCONST * 0.25);
 
-        while (opModeIsActive() && timer.seconds() < 15);
+        while (opModeIsActive() && timer.seconds() < 17) printTelemetry();
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        frontLeft.setTargetPosition(-3200);
+        frontLeft.setTargetPosition(-3400);
         frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         frontLeft.setVelocity(VELCONST * 0.25);
 
-        rearLeft.setTargetPosition(-3200);
+        rearLeft.setTargetPosition(-3400);
         rearLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rearLeft.setVelocity(VELCONST * 0.25);
 
-        frontRight.setTargetPosition(-3200);
+        frontRight.setTargetPosition(-3400);
         frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         frontRight.setVelocity(VELCONST * 0.25);
 
-        rearRight.setTargetPosition(-3200);
+        rearRight.setTargetPosition(-3400);
         rearRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rearRight.setVelocity(VELCONST * 0.25);
 
-        while (opModeIsActive() && timer.seconds() < 25);
+        while (opModeIsActive() && timer.seconds() < 27) printTelemetry();
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -161,6 +159,11 @@ public class ShootingAuto extends LinearOpMode {
         rearRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rearRight.setVelocity(VELCONST * 0.25);
 
-        while (opModeIsActive());
+        while (opModeIsActive()) printTelemetry();
+    }
+
+    private void printTelemetry() {
+        telemetry.addData("turret vel: ",turretShoot.getVelocity());
+        telemetry.update();
     }
 }

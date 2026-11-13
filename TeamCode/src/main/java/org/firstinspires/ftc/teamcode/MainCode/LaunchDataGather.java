@@ -36,6 +36,8 @@ public class LaunchDataGather extends LinearOpMode {
     private int activeIntake; // 0 = off, 1 = in, 2 = out
     private double prevBotHeading;
     private double launcherVel;
+    private double outerIntakeTicks;
+    private double innerIntakeTicks;
 
     private static final double[][][] launcherVelPoints = { // formated as {x,y,vel} in a 2d array
             {{0,0,0}, {0,1,0}},
@@ -105,6 +107,8 @@ public class LaunchDataGather extends LinearOpMode {
         lowPower = 1;
         outerIntakeVel = 0.0;
         innerIntakeVel = 0.0;
+        outerIntakeTicks = 0.0;
+        innerIntakeTicks = 0.0;
         activeIntake = 0;
         prevBotHeading = 0.0;
 
@@ -145,6 +149,53 @@ public class LaunchDataGather extends LinearOpMode {
             if (Math.abs(rx) > 0.05) prevBotHeading = botHeading;
 
             // intake
+            /*
+            if (gamepad2.leftBumperWasPressed()) {
+                outerIntakeTicks += 0.05;
+            } else if (gamepad2.leftTriggerWasPressed()) {
+                outerIntakeTicks -= 0.05;
+            }
+            if (Math.abs(outerIntakeTicks) > VELCONST) {
+                outerIntakeTicks = Math.copySign(VELCONST,outerIntakeTicks);
+            }
+            if (gamepad2.leftBumperWasPressed()) {
+                innerIntakeTicks += 0.05;
+            } else if (gamepad2.leftTriggerWasPressed()) {
+                innerIntakeTicks -= 0.05;
+            }
+            if (Math.abs(innerIntakeTicks) > VELCONST) {
+                innerIntakeTicks = Math.copySign(VELCONST,innerIntakeTicks);
+            }
+
+            if (gamepad1.aWasPressed()) {
+                if (activeIntake == 1) {
+                    outerIntakeVel = 0;
+                    activeIntake = 0;
+                }
+                else {
+                    outerIntakeVel = innerIntakeTicks;
+                    activeIntake = 1;
+                }
+
+            } else if (gamepad1.bWasPressed()) {
+                if (activeIntake == 2) {
+                    outerIntakeVel = 0;
+                    activeIntake = 0;
+                }
+                else {
+                    outerIntakeVel = -innerIntakeTicks;
+                    activeIntake = 2;
+                }
+
+            }
+
+            if (gamepad2.b) {
+                innerIntakeVel = outerIntakeTicks;
+            }
+            else if (gamepad2.a) {
+                innerIntakeVel = -outerIntakeTicks;
+            }
+             */
             if (gamepad1.aWasPressed()) {
                 if (activeIntake == 1) {
                     outerIntakeVel = 0;
@@ -168,10 +219,10 @@ public class LaunchDataGather extends LinearOpMode {
             }
 
             if (gamepad2.b) {
-                innerIntakeVel = VELCONST * 0.2;
+                innerIntakeVel = VELCONST * 0.6;
             }
             else if (gamepad2.a) {
-                innerIntakeVel = -VELCONST * 0.2;
+                innerIntakeVel = -VELCONST * 0.6;
             }
 
             if (gamepad1.rightBumperWasPressed()){
@@ -278,6 +329,9 @@ public class LaunchDataGather extends LinearOpMode {
             telemetry.addData("robot y dist: ",yDistToTarget);
             telemetry.addData("robot h: ",odometryPos.h);
             telemetry.addData("low power mode: ",lowPower);
+
+            telemetry.addData("Inner intake vel: ",innerIntakeTicks);
+            telemetry.addData("Outer intake vel: ",outerIntakeTicks);
 
             telemetry.addData("frontLeft power draw: ", frontLeft.getCurrent(CurrentUnit.AMPS));
             telemetry.addData("rearLeft power draw: ", rearLeft.getCurrent(CurrentUnit.AMPS));
