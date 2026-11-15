@@ -265,7 +265,7 @@ public class FieldCentric extends LinearOpMode {
                     turretTicksToRotate = turretSpin.getCurrentPosition() - 20;
                 }
                 if (gamepad2.left_bumper) {
-                    launcherVel = 1300;
+                    launcherVel = 1350;
                 }
                 else if (gamepad2.right_bumper) {
                     launcherVel = 1200;

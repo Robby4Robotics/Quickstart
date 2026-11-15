@@ -69,25 +69,47 @@ public class ShootingAuto extends LinearOpMode {
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        frontLeft.setTargetPosition(-800);
+        frontLeft.setTargetPosition(-700);
         frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         frontLeft.setVelocity(VELCONST * 0.25);
 
-        rearLeft.setTargetPosition(-800);
+        rearLeft.setTargetPosition(-700);
         rearLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rearLeft.setVelocity(VELCONST * 0.25);
 
-        frontRight.setTargetPosition(-800);
+        frontRight.setTargetPosition(-700);
         frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         frontRight.setVelocity(VELCONST * 0.25);
 
-        rearRight.setTargetPosition(-800);
+        rearRight.setTargetPosition(-700);
         rearRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rearRight.setVelocity(VELCONST * 0.25);
 
         while (opModeIsActive() && timer.seconds() < 3) printTelemetry();
         innerIntake.setVelocity(VELCONST * 0.75);
         outerIntake.setVelocity(VELCONST * 0.5);
+
+        while (opModeIsActive() && timer.seconds() < 4) printTelemetry();
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rearLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        frontLeft.setTargetPosition(200);
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontLeft.setVelocity(VELCONST * 0.33);
+
+        rearLeft.setTargetPosition(200);
+        rearLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rearLeft.setVelocity(VELCONST * 0.33);
+
+        frontRight.setTargetPosition(200);
+        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRight.setVelocity(VELCONST * 0.33);
+
+        rearRight.setTargetPosition(200);
+        rearRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rearRight.setVelocity(VELCONST * 0.33);
 
         while (opModeIsActive() && timer.seconds() < 12) printTelemetry();
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -121,19 +143,19 @@ public class ShootingAuto extends LinearOpMode {
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rearRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        frontLeft.setTargetPosition(-3400);
+        frontLeft.setTargetPosition(-3700);
         frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         frontLeft.setVelocity(VELCONST * 0.25);
 
-        rearLeft.setTargetPosition(-3400);
+        rearLeft.setTargetPosition(-3700);
         rearLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rearLeft.setVelocity(VELCONST * 0.25);
 
-        frontRight.setTargetPosition(-3400);
+        frontRight.setTargetPosition(-3700);
         frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         frontRight.setVelocity(VELCONST * 0.25);
 
-        rearRight.setTargetPosition(-3400);
+        rearRight.setTargetPosition(-3700);
         rearRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rearRight.setVelocity(VELCONST * 0.25);
 
