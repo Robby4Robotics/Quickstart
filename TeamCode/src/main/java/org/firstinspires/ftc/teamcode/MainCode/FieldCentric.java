@@ -44,11 +44,6 @@ public class FieldCentric extends LinearOpMode {
     private int activeIntake; // 0 = off, 1 = in, 2 = out
     private double prevBotHeading;
 
-    private static final double[][][] launcherVelPoints = { // formated as {x,y,vel} in a 2d array
-            {{0,0,0}, {0,1,0}},
-            {{0,1,0}, {1,1,0}}
-    };
-
     /* LIMELIGHT
     // Index of the Python pipeline in the Limelight web UI.
     private static final int CLUSTER_PIPELINE = 1;
@@ -164,27 +159,6 @@ public class FieldCentric extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-
-            /*
-            //LIMELIGHT
-            LLResult result = limelight.getLatestResult();
-            double[] py = (result != null) ? result.getPythonOutput() : null;
-
-            if (py != null && py.length >= 8 && py[CLUSTER_ID] >= 0) {
-                telemetry.addData("Cluster", "%d  (%d/4 tags)", (int) py[CLUSTER_ID], (int) py[NUM_TAGS]);
-                telemetry.addData("Range (in)", "%.1f", py[RANGE]);
-                telemetry.addData("Bearing (+ left)", "%.2f°", py[BEARING]);
-                telemetry.addData("Height (in)", "%.1f", py[HEIGHT]);
-                telemetry.addData("Elevation", "%.2f°", py[ELEVATION]);
-                telemetry.addData("Sticker pitch", "%.1f°", py[STICKER_PITCH]);
-                telemetry.addData("Roll", "%.1f°  %s", py[ROLL],
-                        Math.abs(py[ROLL]) < 90 ? "right-side up" : "upside down");
-            } else {
-                telemetry.addLine("No cluster");
-            }
-            telemetry.update();
-             */
-
             // Joystick controls
             double y = gamepad1.left_stick_y;
             double x = -gamepad1.left_stick_x;
@@ -193,9 +167,16 @@ public class FieldCentric extends LinearOpMode {
             // Get robot heading
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
+            /*
+            // LIMELIGHT
+            LLResult result = limelight.getLatestResult();
+            double[] py = (result != null) ? result.getPythonOutput() : null;
+             */
+            double[] py = {};
+
             // saving new target imu pos if rotated
-            boolean hasRotated;
-            if (Math.abs(rx) > 0.05) prevBotHeading = botHeading;
+            // boolean hasRotated;
+            // if (Math.abs(rx) > 0.05) prevBotHeading = botHeading;
 
             // intake
             if (gamepad1.aWasPressed()) {
@@ -257,6 +238,14 @@ public class FieldCentric extends LinearOpMode {
 
             SparkFunOTOS.Pose2D odometryPos = odometry.getPosition();
 
+            // using limelight if it detects a cluster
+            if (py != null && py[0] != -1) {
+                if (py[0] == 30 || py[0] == 42) {
+                    odometryPos = new SparkFunOTOS.Pose2D(1.5575 - py[2] * Math.cos(py[3]), 1.50625 - py[2] * Math.sin(py[3]), odometryPos.h);
+                }
+                odometryPos = new SparkFunOTOS.Pose2D(2.1025 - py[2] * Math.cos(py[3]), 1.50625 - py[2] * Math.sin(py[3]), odometryPos.h);
+            }
+
             // checking which hive to aim for
             double xDistToTarget;
             if (odometryPos.x < 1.83) xDistToTarget = 1.5575 - odometryPos.x;
@@ -297,22 +286,8 @@ public class FieldCentric extends LinearOpMode {
             double launcherVel = 0;
 
             if (activeLauncher && !manualTurret) {
-                // getting square to interpolate from
-                int i = 1;
-                while (launcherVelPoints[0][i][0] < odometryPos.x) i++;
-
-                int j = 1;
-                while (launcherVelPoints[j][i][1] < odometryPos.y) j++;
-
-                // linear interpolation math
-                double InterpXTop = ((launcherVelPoints[j][i][0] - odometryPos.x) / (launcherVelPoints[j][i][0] - launcherVelPoints[j][i-1][0])) * launcherVelPoints[j][i][2]
-                        + (( odometryPos.x -launcherVelPoints[j][i-1][0]) / (launcherVelPoints[j][i][0] - launcherVelPoints[j][i-1][0])) * launcherVelPoints[j][i-1][2];
-                double InterpXBot = ((launcherVelPoints[j-1][i][0] - odometryPos.x) / (launcherVelPoints[j-1][i][0] - launcherVelPoints[j-1][i-1][0])) * launcherVelPoints[j-1][i][2]
-                        + (( odometryPos.x -launcherVelPoints[j-1][i-1][0]) / (launcherVelPoints[j-1][i][0] - launcherVelPoints[j-1][i-1][0])) * launcherVelPoints[j-1][i-1][2];
-                double InterpFinal = ((launcherVelPoints[j][i][1] - odometryPos.y) / (launcherVelPoints[j][i][1] - launcherVelPoints[j-1][i][1])) * InterpXTop
-                        + (( odometryPos.y -launcherVelPoints[j-1][i][1]) / (launcherVelPoints[j][i][1] - launcherVelPoints[j-1][i][1])) * InterpXBot;
-
-                launcherVel = InterpFinal;
+                // use interpolation equation here
+                // launcherVel = ;
             }
 
 
@@ -384,6 +359,7 @@ public class FieldCentric extends LinearOpMode {
             turretShoot.setVelocity(launcherVel);
 
             // Telemetry
+            /*
             telemetry.addData(
                     "Heading",
                     "%.1f°",
@@ -403,6 +379,22 @@ public class FieldCentric extends LinearOpMode {
                     rearLeftVel,
                     rearRightVel
             );
+             */
+            // Limelight
+            /*
+            if (py != null && py.length >= 8 && py[CLUSTER_ID] >= 0) {
+                telemetry.addData("Cluster", "%d  (%d/4 tags)", (int) py[CLUSTER_ID], (int) py[NUM_TAGS]);
+                telemetry.addData("Range (in)", "%.1f", py[RANGE]);
+                telemetry.addData("Bearing (+ left)", "%.2f°", py[BEARING]);
+                telemetry.addData("Height (in)", "%.1f", py[HEIGHT]);
+                telemetry.addData("Elevation", "%.2f°", py[ELEVATION]);
+                telemetry.addData("Sticker pitch", "%.1f°", py[STICKER_PITCH]);
+                telemetry.addData("Roll", "%.1f°  %s", py[ROLL],
+                        Math.abs(py[ROLL]) < 90 ? "right-side up" : "upside down");
+            } else {
+                telemetry.addLine("No cluster");
+            }
+             */
 
             // telemetry.addData("Inner Intake vel: ",innerIntakeVel);
             // telemetry.addData("Outer Intake vel: ",outerIntakeVel);
