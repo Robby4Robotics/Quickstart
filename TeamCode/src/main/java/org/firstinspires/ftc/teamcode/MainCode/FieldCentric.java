@@ -65,27 +65,6 @@ public class FieldCentric extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
-        /*
-        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        limelight.pipelineSwitch(CLUSTER_PIPELINE);
-        limelight.start();
-
-        // LIMELIGHT
-        while (opModeInInit()) {
-            if (gamepad1.b) alliance = RED;
-            if (gamepad1.x) alliance = BLUE;
-            if (gamepad1.a) alliance = ANY;
-            telemetry.addData("Alliance (B red / X blue / A any)",
-                    alliance == RED ? "RED" : alliance == BLUE ? "BLUE" : "ANY");
-            telemetry.update();
-        }
-        // Inputs: [0] 1 = inputs valid (0 makes the script use its own defaults),
-        // [1] alliance, [2] camera pitch in degrees
-        limelight.updatePythonInputs(new double[] {1, alliance, CAMERA_PITCH_DEG, 0, 0, 0, 0, 0});
-
-         */
-
         // Initialize drive motors
         frontLeft = hardwareMap.get(DcMotorEx.class, "frontleft");
         rearLeft = hardwareMap.get(DcMotorEx.class, "rearleft");
@@ -155,6 +134,26 @@ public class FieldCentric extends LinearOpMode {
 
         waitForStart();
         imu.resetYaw();
+
+        /*
+        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(CLUSTER_PIPELINE);
+        limelight.start();
+
+        // LIMELIGHT
+        while (opModeInInit()) {
+            if (gamepad1.b) alliance = RED;
+            if (gamepad1.x) alliance = BLUE;
+            if (gamepad1.a) alliance = ANY;
+            telemetry.addData("Alliance (B red / X blue / A any)",
+                    alliance == RED ? "RED" : alliance == BLUE ? "BLUE" : "ANY");
+            telemetry.update();
+        }
+        // Inputs: [0] 1 = inputs valid (0 makes the script use its own defaults),
+        // [1] alliance, [2] camera pitch in degrees
+        limelight.updatePythonInputs(new double[] {1, alliance, CAMERA_PITCH_DEG, 0, 0, 0, 0, 0});
+
+         */
 
         if (isStopRequested()) return;
 
@@ -243,7 +242,8 @@ public class FieldCentric extends LinearOpMode {
                 if (py[0] == 30 || py[0] == 42) {
                     odometryPos = new SparkFunOTOS.Pose2D(1.5575 - py[2] * Math.cos(py[3]), 1.50625 - py[2] * Math.sin(py[3]), odometryPos.h);
                 }
-                odometryPos = new SparkFunOTOS.Pose2D(2.1025 - py[2] * Math.cos(py[3]), 1.50625 - py[2] * Math.sin(py[3]), odometryPos.h);
+                else odometryPos = new SparkFunOTOS.Pose2D(2.1025 - py[2] * Math.cos(py[3]), 1.50625 - py[2] * Math.sin(py[3]), odometryPos.h);
+                odometry.setPosition(odometryPos);
             }
 
             // checking which hive to aim for

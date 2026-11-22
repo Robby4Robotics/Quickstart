@@ -12,6 +12,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+
 @TeleOp(name = "LaunchDataGather" +
         "", group = "Test")
 
@@ -39,14 +43,27 @@ public class LaunchDataGather extends LinearOpMode {
     private double outerIntakeTicks;
     private double innerIntakeTicks;
 
-    private static final double[][][] launcherVelPoints = { // formated as {x,y,vel} in a 2d array
-            {{0,0,0}, {0,1,0}},
-            {{0,1,0}, {1,1,0}}
-    };
+    /* LIMELIGHT
+    // Index of the Python pipeline in the Limelight web UI.
+    private static final int CLUSTER_PIPELINE = 1;
+
+    // Camera pitch in degrees, + = tilted up (0 = level, 90 = straight up).
+    // Measure this on the robot.
+    private static final double CAMERA_PITCH_DEG = 30.0;
+
+    // Python input [1] values
+    private static final double ANY = 0, BLUE = 1, RED = 2;
+
+    // llpython layout (must match apriltag_cluster.py). Distances are in inches,
+    // angles in degrees: use Math.toRadians() before Math.sin/cos/tan.
+    private static final int CLUSTER_ID = 0, NUM_TAGS = 1, RANGE = 2, BEARING = 3,
+            HEIGHT = 4, ELEVATION = 5, STICKER_PITCH = 6, ROLL = 7;
+
+    private static double alliance;
+    */
 
     @Override
     public void runOpMode() {
-
         // Initialize drive motors
         frontLeft = hardwareMap.get(DcMotorEx.class, "frontleft");
         rearLeft = hardwareMap.get(DcMotorEx.class, "rearleft");
@@ -125,6 +142,26 @@ public class LaunchDataGather extends LinearOpMode {
         waitForStart();
         imu.resetYaw();
 
+        /*
+        Limelight3A limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.pipelineSwitch(CLUSTER_PIPELINE);
+        limelight.start();
+
+        // LIMELIGHT
+        while (opModeInInit()) {
+            if (gamepad1.b) alliance = RED;
+            if (gamepad1.x) alliance = BLUE;
+            if (gamepad1.a) alliance = ANY;
+            telemetry.addData("Alliance (B red / X blue / A any)",
+                    alliance == RED ? "RED" : alliance == BLUE ? "BLUE" : "ANY");
+            telemetry.update();
+        }
+        // Inputs: [0] 1 = inputs valid (0 makes the script use its own defaults),
+        // [1] alliance, [2] camera pitch in degrees
+        limelight.updatePythonInputs(new double[] {1, alliance, CAMERA_PITCH_DEG, 0, 0, 0, 0, 0});
+
+         */
+
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
@@ -137,6 +174,21 @@ public class LaunchDataGather extends LinearOpMode {
             double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
             SparkFunOTOS.Pose2D odometryPos = odometry.getPosition();
+
+            /*
+            // LIMELIGHT
+            LLResult result = limelight.getLatestResult();
+            double[] py = (result != null) ? result.getPythonOutput() : null;
+             */
+            double[] py = {};
+
+            if (py != null && py[0] != -1) {
+                if (py[0] == 30 || py[0] == 42) {
+                    odometryPos = new SparkFunOTOS.Pose2D(1.5575 - py[2] * Math.cos(py[3]), 1.50625 - py[2] * Math.sin(py[3]), odometryPos.h);
+                }
+                else odometryPos = new SparkFunOTOS.Pose2D(2.1025 - py[2] * Math.cos(py[3]), 1.50625 - py[2] * Math.sin(py[3]), odometryPos.h);
+                odometry.setPosition(odometryPos);
+            }
 
             double xDistToTarget;
             if (odometryPos.x < 1.83) xDistToTarget = 1.5575 - odometryPos.x;
@@ -298,25 +350,20 @@ public class LaunchDataGather extends LinearOpMode {
             turretShoot.setVelocity(launcherVel);
 
             // Telemetry
-            telemetry.addData(
-                    "Heading",
-                    "%.1f°",
-                    Math.toDegrees(botHeading)
-            );
-
-            telemetry.addData(
-                    "Front Left/Right",
-                    "%.2f, %.2f",
-                    frontLeftVel,
-                    frontRightVel
-            );
-
-            telemetry.addData(
-                    "Rear Left/Right",
-                    "%.2f, %.2f",
-                    rearLeftVel,
-                    rearRightVel
-            );
+            /*
+            if (py != null && py.length >= 8 && py[CLUSTER_ID] >= 0) {
+                telemetry.addData("Cluster", "%d  (%d/4 tags)", (int) py[CLUSTER_ID], (int) py[NUM_TAGS]);
+                telemetry.addData("Range (in)", "%.1f", py[RANGE]);
+                telemetry.addData("Bearing (+ left)", "%.2f°", py[BEARING]);
+                telemetry.addData("Height (in)", "%.1f", py[HEIGHT]);
+                telemetry.addData("Elevation", "%.2f°", py[ELEVATION]);
+                telemetry.addData("Sticker pitch", "%.1f°", py[STICKER_PITCH]);
+                telemetry.addData("Roll", "%.1f°  %s", py[ROLL],
+                        Math.abs(py[ROLL]) < 90 ? "right-side up" : "upside down");
+            } else {
+                telemetry.addLine("No cluster");
+            }
+             */
 
             // telemetry.addData("Inner Intake vel: ",innerIntakeVel);
             // telemetry.addData("Outer Intake vel: ",outerIntakeVel);
@@ -344,5 +391,6 @@ public class LaunchDataGather extends LinearOpMode {
 
             telemetry.update();
         }
+        //limelight.stop();
     }
 }
